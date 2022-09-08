@@ -1,0 +1,253 @@
+﻿<Window x:Class="FolderManager.Src.Views.FolderManagerView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:converters="clr-namespace:FolderManager.Src.Converters"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:FolderManager.Src.Views"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:models="clr-namespace:FolderManager.Src.Models"
+        xmlns:s="https://github.com/canton7/Stylet"
+        xmlns:system="clr-namespace:System;assembly=mscorlib"
+        xmlns:vm="clr-namespace:FolderManager.Src.ViewModels"
+        Title="Folder Manager"
+        Width="350"
+        Height="585"
+        d:DataContext="{d:DesignInstance vm:FolderManagerViewModel}"
+        AllowsTransparency="True"
+        Background="Transparent"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
+        mc:Ignorable="d">
+    <Window.Resources>
+        <converters:BooleanToVisibilityConvertert x:Key="b2vConverter" />
+        <converters:InvertBooleanToVisibilityConvertert x:Key="Ib2vConverter" />
+
+        <x:Array x:Key="designListData" Type="{x:Type system:String}">
+            <system:String>a</system:String>
+            <system:String>a</system:String>
+            <system:String>a</system:String>
+            <system:String>a</system:String>
+            <system:String>a</system:String>
+            <system:String>a</system:String>
+            <system:String>a</system:String>
+            <system:String>a</system:String>
+            <system:String>a</system:String>
+            <system:String>a</system:String>
+            <system:String>a</system:String>
+            <system:String>a</system:String>
+            <system:String>a</system:String>
+            <system:String>a</system:String>
+            <system:String>a</system:String>
+            <system:String>a</system:String>
+        </x:Array>
+
+        <Style x:Key="buttonStyle" TargetType="{x:Type Button}">
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border Background="{TemplateBinding Background}" Cursor="{TemplateBinding Cursor}">
+                            <ContentPresenter Margin="{TemplateBinding Padding}"
+                                              HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              Content="{TemplateBinding Content}"
+                                              TextBlock.FontSize="{TemplateBinding FontSize}"
+                                              TextBlock.FontWeight="Bold"
+                                              TextBlock.Foreground="{TemplateBinding Foreground}" />
+
+                            <Border.Style>
+                                <Style TargetType="{x:Type Border}">
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Opacity" Value="0.8" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <DataTemplate x:Key="FolderInfoTemplate" DataType="{x:Type models:FolderInfo}">
+            <Grid>
+                <Border Padding="0,3" Visibility="{Binding IsSpliter, Converter={StaticResource Ib2vConverter}}">
+                    <Grid Width="250" Height="20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <TextBox Grid.Column="0"
+                                 Width="230"
+                                 VerticalContentAlignment="Center"
+                                 Background="Transparent"
+                                 CaretBrush="#36F"
+                                 Foreground="AliceBlue"
+                                 Text="{Binding Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                 Visibility="{Binding IsEdit, Converter={StaticResource b2vConverter}, UpdateSourceTrigger=PropertyChanged}">
+                            <TextBox.InputBindings>
+                                <KeyBinding Key="Return" Command="{s:Action EditFolderInfo}" CommandParameter="{Binding}" />
+                            </TextBox.InputBindings>
+                        </TextBox>
+
+                        <TextBlock x:Name="textBlock"
+                                   Grid.Column="0"
+                                   Margin="10,0,0,0"
+                                   VerticalAlignment="Center"
+                                   Background="Transparent"
+                                   Foreground="#DFDFE0"
+                                   Text="{Binding Name}"
+                                   Visibility="{Binding IsEdit, Converter={StaticResource Ib2vConverter}, UpdateSourceTrigger=PropertyChanged}" />
+
+                        <Button Grid.Column="2"
+                                Width="30"
+                                Margin="0,0,10,0"
+                                Padding="0"
+                                HorizontalContentAlignment="Center"
+                                VerticalContentAlignment="Center"
+                                Background="Transparent"
+                                Command="{s:Action OpenFolder}"
+                                CommandParameter="{Binding}"
+                                Style="{StaticResource buttonStyle}"
+                                Visibility="{Binding IsEdit, Converter={StaticResource Ib2vConverter}, UpdateSourceTrigger=PropertyChanged}">
+                            <Viewbox Margin="2">
+                                <Image RenderOptions.BitmapScalingMode="HighQuality" Source="/Src/Resources/open.png" />
+                            </Viewbox>
+                        </Button>
+                    </Grid>
+
+                    <Border.Style>
+                        <Style TargetType="{x:Type Border}">
+                            <Setter Property="Background" Value="Transparent" />
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#6111" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+
+                    <Border.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Command="{s:Action DeleteFolderInfo}" CommandParameter="{Binding}" Header="刪除" />
+                            <MenuItem Command="{s:Action EditFolderInfo}" CommandParameter="{Binding}" Header="編輯名稱" />
+                            <MenuItem Header="Edit path" Visibility="Collapsed" />
+                        </ContextMenu>
+                    </Border.ContextMenu>
+
+                    <!--<Border.InputBindings>
+                        <MouseBinding Command="{s:Action EditFolderInfo}" CommandParameter="{Binding}" MouseAction="LeftClick" />
+                    </Border.InputBindings>-->
+                </Border>
+
+                <Border Width="240" Height="12" Visibility="{Binding IsSpliter, Converter={StaticResource b2vConverter}}">
+                    <Polyline HorizontalAlignment="Center"
+                              VerticalAlignment="Center"
+                              Points="0,0 1,0"
+                              Stretch="Fill"
+                              Stroke="#888"
+                              StrokeThickness="1.5" />
+                </Border>
+            </Grid>
+        </DataTemplate>
+    </Window.Resources>
+
+    <Border Padding="5" Background="Transparent" BorderThickness="0">
+        <Border Background="#232628" BorderBrush="#3284CF" BorderThickness="1">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="5" ShadowDepth="0" Color="#82C6FC" />
+            </Border.Effect>
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Grid Background="Transparent" MouseMove="Grid_MouseMove">
+                    <Path VerticalAlignment="Bottom"
+                          Data="M0,0 1,0"
+                          Stretch="Uniform"
+                          Stroke="#444"
+                          StrokeThickness="1" />
+
+                    <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top" Orientation="Horizontal">
+                        <StackPanel.Resources>
+                            <Style BasedOn="{StaticResource buttonStyle}" TargetType="Button">
+                                <Setter Property="BorderThickness" Value="0" />
+                                <Setter Property="Background" Value="Transparent" />
+                                <Setter Property="Cursor" Value="Arrow" />
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="#32383F" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Resources>
+
+                        <Button x:Name="btn_Minimized"
+                                Width="40"
+                                Height="30"
+                                Click="btn_Minimized_Click"
+                                Foreground="White">
+                            <Button.Content>
+                                <Path Data="M0,0 12,0"
+                                      IsHitTestVisible="False"
+                                      Stroke="{Binding ElementName=btn_Close, Path=Foreground}"
+                                      StrokeThickness="1" />
+                            </Button.Content>
+                        </Button>
+
+                        <Button x:Name="btn_Close"
+                                Width="40"
+                                Height="30"
+                                Click="btn_Close_Click"
+                                Foreground="White">
+                            <Button.Content>
+                                <Path Data="M0,0 10,10 M10,0 0,10"
+                                      IsHitTestVisible="False"
+                                      Stroke="{Binding ElementName=btn_Close, Path=Foreground}"
+                                      StrokeThickness="1" />
+                            </Button.Content>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+
+                <Grid Grid.Row="1"
+                      AllowDrop="True"
+                      Background="Transparent"
+                      PreviewDrop="Border_PreviewDrop">
+                    <ScrollViewer Focusable="False" VerticalScrollBarVisibility="Hidden">
+                        <ItemsControl d:ItemsSource="{StaticResource designListData}"
+                                      d:Width="300"
+                                      Focusable="False"
+                                      ItemTemplate="{StaticResource FolderInfoTemplate}"
+                                      ItemsSource="{Binding FolderInfos}" />
+
+                        <ScrollViewer.InputBindings>
+                            <MouseBinding Command="{s:Action EditFolderInfo}" CommandParameter="{x:Null}" MouseAction="LeftClick" />
+                        </ScrollViewer.InputBindings>
+                    </ScrollViewer>
+                </Grid>
+
+                <Button Grid.Row="2"
+                        Width="30"
+                        Height="30"
+                        Margin="10"
+                        Padding="0.5,0,0,2.5"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Bottom"
+                        Background="#369"
+                        Command="{s:Action OpenFolderPicker}"
+                        Content="+"
+                        Focusable="False"
+                        FontSize="20"
+                        Foreground="White"
+                        Style="{StaticResource buttonStyle}" />
+            </Grid>
+        </Border>
+    </Border>
+</Window>
